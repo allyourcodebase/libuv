@@ -35,8 +35,8 @@ your_exe.linkLibrary(libuv_dep.artifact("uv"));
 
 ## Zig Version Support Matrix
 
-|  Refname  | libuv Version  | Zig `0.13` | Zig `0.14.0-dev` |
-|-----------|----------------|------------|------------------|
-|           | `1.50.0`       | ✅         | ✅              |
+|  Refname  | libuv Version  | Zig `0.14.0` |
+|-----------|----------------|--------------|
+|           | `1.50.0`       | ✅           |
 
 [libuv]: https://github.com/libuv

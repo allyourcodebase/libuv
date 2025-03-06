@@ -12,13 +12,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        zig-version: ["0.13.0"]
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        zig-version: ["0.14.0"]
+        os: [ubuntu-latest, windows-latest]
         include:
-          - zig-version: "master"
+          - zig-version: "0.14.0"
             check-format: true
             os: macos-latest
             build-options: "-Dbuild-tests -Dbuild-benchmarks"
+
+          - zig-version: "master"
+            os: macos-latest
+
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout

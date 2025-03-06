@@ -81,10 +81,10 @@ pub fn build(b: *std.Build) void {
                 include_root.path(b, "uv/unix.h"),
                 "uv/unix.h",
             );
-            if (!tinfo.isAndroid())
+            if (!tinfo.abi.isAndroid())
                 lib.linkSystemLibrary("pthread");
 
-            if (tinfo.isDarwin()) {
+            if (tinfo.os.tag.isDarwin()) {
                 lib.root_module.addCMacro("_DARWIN_UNLIMITED_SELECT", "1");
                 lib.root_module.addCMacro("_DARWIN_USE_64_BIT_INODE", "1");
                 lib.addCSourceFiles(.{
@@ -96,7 +96,7 @@ pub fn build(b: *std.Build) void {
                     include_root.path(b, "uv/darwin.h"),
                     "uv/darwin.h",
                 );
-            } else if (tinfo.isAndroid()) {
+            } else if (tinfo.abi.isAndroid()) {
                 lib.root_module.addCMacro("_GNU_SOURCE", "");
                 lib.linkSystemLibrary("dl");
                 lib.addCSourceFiles(.{
