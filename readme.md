@@ -27,6 +27,10 @@ const libuv_dep = b.dependency("libuv", .{
     .optimize = optimize,
 });
 your_exe.linkLibrary(libuv_dep.artifact("uv"));
+
+if (target.result.os.tag == .windows and optimize == .Debug) {
+    your_exe.linkSystemLibrary("ucrtbased");
+}
 ```
 
 ## Dependencies
