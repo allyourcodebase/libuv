@@ -55,6 +55,8 @@ pub fn build(b: *std.Build) void {
             lib.linkSystemLibrary("dbghelp");
             lib.linkSystemLibrary("ole32");
             lib.linkSystemLibrary("shell32");
+            if (optimize == .Debug)
+                lib.linkSystemLibrary("ucrtbased");
             lib.addCSourceFiles(.{
                 .root = src_root,
                 .files = win_sources,
