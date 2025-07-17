@@ -14,10 +14,13 @@ pub fn build(b: *std.Build) void {
 
     const upstream = b.dependency("libuv", .{});
 
-    const lib = b.addStaticLibrary(.{
+    const lib = b.addLibrary(.{
         .name = "uv",
-        .target = target,
-        .optimize = optimize,
+        .linkage = .static,
+        .root_module = b.createModule(.{
+            .target = target,
+            .optimize = optimize,
+        }),
     });
 
     const cflags: []const []const u8 = &.{
@@ -252,8 +255,10 @@ pub fn build(b: *std.Build) void {
     if (build_tests) {
         const tests = b.addExecutable(.{
             .name = "uv_run_tests_a",
-            .target = target,
-            .optimize = optimize,
+            .root_module = b.createModule(.{
+                .target = target,
+                .optimize = optimize,
+            }),
         });
         tests.addCSourceFiles(.{
             .root = test_root,
@@ -286,8 +291,10 @@ pub fn build(b: *std.Build) void {
     if (build_benchmarks) {
         const benchmarks = b.addExecutable(.{
             .name = "uv_run_benchmarks_a",
-            .target = target,
-            .optimize = optimize,
+            .root_module = b.createModule(.{
+                .target = target,
+                .optimize = optimize,
+            }),
         });
 
         benchmarks.addCSourceFiles(.{
