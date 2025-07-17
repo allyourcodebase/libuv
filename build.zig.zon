@@ -5,8 +5,8 @@
     .minimum_zig_version = "0.14.0",
     .dependencies = .{
         .libuv = .{
-            .url = "git+https://github.com/libuv/libuv?ref=v1.50.0#8fb9cb919489a48880680a56efecff6a7dfb4504",
-            .hash = "N-V-__8AAH34QwB6wi5eQK_lFbfDGSN3hRE8l-6Ep198ZsGg",
+            .url = "git+https://github.com/libuv/libuv?ref=v1.51.0#5152db2cbfeb5582e9c27c5ea1dba2cd9e10759b",
+            .hash = "N-V-__8AABtNRAB58M85Dm0p6z6iRHP3Zz3eyo08HU4EF5mq",
         },
     },
     .paths = .{
