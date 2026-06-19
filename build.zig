@@ -456,7 +456,6 @@ const emscripten_sources: []const []const u8 = &.{
     "unix/no-fsevents.c",
     "unix/no-proctitle.c",
     "unix/posix-hrtime.c",
-    "unix/posix-poll.c",
 };
 
 const haiku_sources: []const []const u8 = &.{
