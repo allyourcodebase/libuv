@@ -1,12 +1,12 @@
 .{
     .name = .libuv,
     .fingerprint = 0x7CB3932CBFAADA86,
-    .version = "1.52.1",
+    .version = "1.53.0",
     .minimum_zig_version = "0.14.0",
     .dependencies = .{
         .libuv = .{
-            .url = "git+https://github.com/libuv/libuv?ref=v1.52.1#a19ceeb13a3689cfd20bf96b283136cff08a0dc6",
-            .hash = "N-V-__8AAF0TRQB7f11_kVHJXTkp9QLCD20udiPXEsoNg9cC",
+            .url = "git+https://github.com/libuv/libuv?ref=v1.53.0#840404ce8ba7cc0204be52389a6cfff9f2c90fb6",
+            .hash = "N-V-__8AAJDFRwBAOnHfjLo8JKU56CoS83XDbuaNIxTM_WXo",
         },
     },
     .paths = .{
