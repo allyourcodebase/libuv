@@ -59,8 +59,9 @@ pub fn build(b: *std.Build) void {
             root_module.linkSystemLibrary("dbghelp", .{});
             root_module.linkSystemLibrary("ole32", .{});
             root_module.linkSystemLibrary("shell32", .{});
-            if (optimize == .Debug)
+            if (isDebugBuild(optimize))
                 root_module.linkSystemLibrary("ucrtbased", .{});
+
             root_module.addCSourceFiles(.{
                 .root = src_root,
                 .files = win_sources,
@@ -341,6 +342,14 @@ pub fn build(b: *std.Build) void {
         benchmarks_module.linkLibrary(lib);
         b.installArtifact(benchmarks);
     }
+}
+
+// Kludge to work around optimization enum member naming change in zig 0.17
+fn isDebugBuild(optimize: anytype) bool {
+    return if (comptime builtin.zig_version.major == 0 and builtin.zig_version.minor <= 16)
+        optimize == .Debug
+    else
+        return optimize == .debug;
 }
 
 const install_headers: []const []const u8 = &.{
@@ -747,3 +756,4 @@ const test_sources: []const []const u8 = &.{
 };
 
 const std = @import("std");
+const builtin = @import("builtin");
