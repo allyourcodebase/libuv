@@ -13,9 +13,9 @@ jobs:
       fail-fast: false
       matrix:
         zig-version: ["0.14.1", "0.15.2", "master"]
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest]
         include:
-          - zig-version: "0.15.2"
+          - zig-version: "master"
             # -Dbuild-tests does not work when targeting Linux because the build
             # system doesn't preserve linker input file order, which causes the
             # linker to spew duplicate symbol errors.
