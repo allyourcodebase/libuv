@@ -59,6 +59,7 @@ pub fn build(b: *std.Build) void {
             root_module.linkSystemLibrary("dbghelp", .{});
             root_module.linkSystemLibrary("ole32", .{});
             root_module.linkSystemLibrary("shell32", .{});
+            root_module.linkSystemLibrary("api-ms-win-core-synch-l1-2-0", .{});
             if (isDebugBuild(optimize))
                 root_module.linkSystemLibrary("ucrtbased", .{});
 
