@@ -59,8 +59,11 @@ pub fn build(b: *std.Build) void {
             root_module.linkSystemLibrary("dbghelp", .{});
             root_module.linkSystemLibrary("ole32", .{});
             root_module.linkSystemLibrary("shell32", .{});
-            root_module.linkSystemLibrary("api-ms-win-core-synch-l1-2-0", .{});
-            if (isDebugBuild(optimize))
+            if (tinfo.abi.isGnu())
+                root_module.linkSystemLibrary("api-ms-win-core-synch-l1-2-0", .{})
+            else
+                root_module.linkSystemLibrary("synchronization", .{});
+            if (isDebugBuild(optimize) and tinfo.abi.isGnu())
                 root_module.linkSystemLibrary("ucrtbased", .{});
 
             root_module.addCSourceFiles(.{
