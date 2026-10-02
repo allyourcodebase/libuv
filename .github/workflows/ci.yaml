@@ -22,6 +22,9 @@ jobs:
             os: macos-latest
             check-format: true
             build-options: "-Dbuild-tests -Dbuild-benchmarks"
+          - zig-version: "master"
+            os: windows-latest
+            build-options: "-Dtarget=native-native-msvc"
 
     runs-on: ${{ matrix.os }}
     steps:
