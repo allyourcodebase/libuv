@@ -446,17 +446,23 @@ const freebsd_sources: []const []const u8 = &.{
     "unix/freebsd.c",
     "unix/posix-hrtime.c",
     "unix/bsd-proctitle.c",
+    "unix/bsd-ifaddrs.c",
+    "unix/kqueue.c",
     "unix/random-getrandom.c",
 };
 const netbsd_sources: []const []const u8 = &.{
     "unix/posix-hrtime.c",
     "unix/bsd-proctitle.c",
+    "unix/bsd-ifaddrs.c",
+    "unix/kqueue.c",
     "unix/netbsd.c",
 };
 const openbsd_sources: []const []const u8 = &.{
     "unix/posix-hrtime.c",
     "unix/bsd-proctitle.c",
     "unix/random-getentropy.c",
+    "unix/bsd-ifaddrs.c",
+    "unix/kqueue.c",
     "unix/openbsd.c",
 };
 
