@@ -42,3 +42,58 @@ jobs:
 
       - name: Build
         run: zig build ${{ matrix.build-options }} --summary all
+
+  bsd:
+    name: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        zig-version: [0.16.0]
+        os: [freebsd, openbsd]
+        include:
+          - os: freebsd
+            packages: pkg install -y curl
+          - os: openbsd
+            packages: pkg_add -I curl xz  # OpenBSD tar cannot decompress .tar.xz
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Build (FreeBSD)
+        if: matrix.os == 'freebsd'
+        uses: vmactions/freebsd-vm@v1.5.9
+        with: &bsd_build
+          cache-after-prepare: true
+          copyback: false
+          prepare: |
+            ${{ matrix.packages }}
+            mkdir -p /usr/local/zig
+            curl -fsSL https://ziglang.org/download/${{ matrix.zig-version }}/zig-x86_64-${{ matrix.os }}-${{ matrix.zig-version }}.tar.xz -o /usr/local/zig/zig.tar.xz
+          run: |
+            set -e
+            xzcat /usr/local/zig/zig.tar.xz | tar -xf - -C /usr/local/zig/
+            export PATH="/usr/local/zig/zig-x86_64-${{ matrix.os }}-${{ matrix.zig-version }}:$PATH"
+
+            cat > ./uv_test.c <<'EOF'
+            #include <uv.h>
+            int main(void) {
+              uv_loop_t* loop = uv_default_loop();
+              uv_interface_address_t* addrs;
+              int count;
+              if (uv_interface_addresses(&addrs, &count) == 0)
+                uv_free_interface_addresses(addrs, count);
+              return uv_run(loop, UV_RUN_DEFAULT);
+            }
+            EOF
+
+            zig build --summary all
+
+            zig cc -o ./uv_test ./uv_test.c -I zig-out/include -L zig-out/lib -luv
+            ./uv_test
+
+      - name: Build (OpenBSD)
+        if: matrix.os == 'openbsd'
+        uses: vmactions/openbsd-vm@v1.4.8
+        with: *bsd_build
