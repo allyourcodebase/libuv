@@ -16,12 +16,8 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         include:
           - zig-version: "master"
-            # -Dbuild-tests does not work when targeting Linux because the build
-            # system doesn't preserve linker input file order, which causes the
-            # linker to spew duplicate symbol errors.
             os: macos-latest
             check-format: true
-            build-options: "-Dbuild-tests -Dbuild-benchmarks"
           - zig-version: "master"
             os: windows-latest
             build-options: "-Dtarget=native-native-msvc"
@@ -41,7 +37,7 @@ jobs:
         run: zig fmt --check --ast-check .
 
       - name: Build
-        run: zig build ${{ matrix.build-options }} --summary all
+        run: zig build -Dbuild-tests -Dbuild-benchmarks ${{ matrix.build-options }} --summary all
 
   bsd:
     name: ${{ matrix.os }}
@@ -56,7 +52,7 @@ jobs:
           - os: freebsd
             packages: pkg install -y curl
           - os: openbsd
-            packages: pkg_add -I curl xz  # OpenBSD tar cannot decompress .tar.xz
+            packages: pkg_add -I curl xz # OpenBSD tar cannot decompress .tar.xz
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -76,22 +72,7 @@ jobs:
             xzcat /usr/local/zig/zig.tar.xz | tar -xf - -C /usr/local/zig/
             export PATH="/usr/local/zig/zig-x86_64-${{ matrix.os }}-${{ matrix.zig-version }}:$PATH"
 
-            cat > ./uv_test.c <<'EOF'
-            #include <uv.h>
-            int main(void) {
-              uv_loop_t* loop = uv_default_loop();
-              uv_interface_address_t* addrs;
-              int count;
-              if (uv_interface_addresses(&addrs, &count) == 0)
-                uv_free_interface_addresses(addrs, count);
-              return uv_run(loop, UV_RUN_DEFAULT);
-            }
-            EOF
-
-            zig build --summary all
-
-            zig cc -o ./uv_test ./uv_test.c -I zig-out/include -L zig-out/lib -luv
-            ./uv_test
+            zig build -Dbuild-tests -Dbuild-benchmarks --summary all
 
       - name: Build (OpenBSD)
         if: matrix.os == 'openbsd'

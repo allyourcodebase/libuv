@@ -279,6 +279,10 @@ pub fn build(b: *std.Build) void {
     const tests = b.addExecutable(.{
         .name = "uv_run_tests_a",
         .root_module = tests_module,
+        .use_lld = if (target.result.ofmt == .elf)
+            false
+        else
+            null,
     });
     tests_module.addCSourceFiles(.{
         .root = test_root,

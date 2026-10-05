@@ -4,9 +4,7 @@ This is [`libuv`][libuv], packaged for [Zig](https://ziglang.org/).
 
 ## Status
 
-In theory, the full intersection of platforms supported by libuv and platforms supported by Zig are supported build targets, but the less common targets are not tested.
-
-Building the unit test executable for linux (and possibly other platforms) does not currently work because the unit test files directly `#include` some of the libuv source files (while also linking to `libuv.a`), and that causes duplicate symbol errors unless the linker command is assembled in a specific order. The zig build system does not enforce a specific order.
+In theory, the full intersection of platforms supported by `libuv` and platforms supported by Zig are supported build targets, but the less common targets are not tested.
 
 ## Usage
 
