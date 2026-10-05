@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        zig-version: ["0.14.1", "0.15.2", "0.16.0", "master"]
+        zig-version: ["0.14.1", "0.15.2", "0.16.0", "0.17.0", "master"]
         os: [ubuntu-latest, windows-latest]
         include:
           - zig-version: "master"
@@ -25,7 +25,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Zig
         uses: mlugg/setup-zig@v2
@@ -40,13 +40,12 @@ jobs:
         run: zig build -Dbuild-tests -Dbuild-benchmarks ${{ matrix.build-options }} --summary all
 
   bsd:
-    name: ${{ matrix.os }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        zig-version: [0.16.0]
+        zig-version: [0.16.0, 0.17.0]
         os: [freebsd, openbsd]
         include:
           - os: freebsd
@@ -55,7 +54,7 @@ jobs:
             packages: pkg_add -I curl xz # OpenBSD tar cannot decompress .tar.xz
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Build (FreeBSD)
         if: matrix.os == 'freebsd'
