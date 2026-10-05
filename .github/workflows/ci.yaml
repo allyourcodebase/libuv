@@ -49,9 +49,9 @@ jobs:
         os: [freebsd, openbsd]
         include:
           - os: freebsd
-            packages: pkg install -y curl
+            packages: pkg install -y curl minisign
           - os: openbsd
-            packages: pkg_add -I curl xz # OpenBSD tar cannot decompress .tar.xz
+            packages: pkg_add -I curl minisign xz # OpenBSD tar cannot decompress .tar.xz
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -64,14 +64,15 @@ jobs:
           copyback: false
           prepare: |
             ${{ matrix.packages }}
-            mkdir -p /usr/local/zig
-            curl -fsSL https://ziglang.org/download/${{ matrix.zig-version }}/zig-x86_64-${{ matrix.os }}-${{ matrix.zig-version }}.tar.xz -o /usr/local/zig/zig.tar.xz
+            mkdir -p /usr/local
+            curl -fsSL https://ziglang.org/download/${{ matrix.zig-version }}/zig-x86_64-${{ matrix.os }}-${{ matrix.zig-version }}.tar.xz -o /tmp/zig.tar.xz
+            curl -fsSL https://ziglang.org/download/${{ matrix.zig-version }}/zig-x86_64-${{ matrix.os }}-${{ matrix.zig-version }}.tar.xz.minisig -o /tmp/zig.tar.xz.minisig
+            minisign -VP 'RWSGOq2NVecA2UPNdBUZykf1CCb147pkmdtYxgb3Ti+JO/wCYvhbAb/U' -m /tmp/zig.tar.xz
+            xzcat /tmp/zig.tar.xz | tar -xf - -C /usr/local/
+            mv /usr/local/zig-x86_64-${{ matrix.os }}-${{ matrix.zig-version }} /usr/local/zig
+            rm -v /tmp/zig.tar.xz /tmp/zig.tar.xz.minisig
           run: |
-            set -e
-            xzcat /usr/local/zig/zig.tar.xz | tar -xf - -C /usr/local/zig/
-            export PATH="/usr/local/zig/zig-x86_64-${{ matrix.os }}-${{ matrix.zig-version }}:$PATH"
-
-            zig build -Dbuild-tests -Dbuild-benchmarks --summary all
+            /usr/local/zig/zig build -Dbuild-tests -Dbuild-benchmarks --summary all
 
       - name: Build (OpenBSD)
         if: matrix.os == 'openbsd'
