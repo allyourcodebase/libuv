@@ -272,80 +272,91 @@ pub fn build(b: *std.Build) void {
 
     b.installArtifact(lib);
 
-    if (build_tests) {
-        var tests_module = b.createModule(.{
-            .target = target,
-            .optimize = optimize,
-        });
-        const tests = b.addExecutable(.{
-            .name = "uv_run_tests_a",
-            .root_module = tests_module,
-        });
+    var tests_module = b.createModule(.{
+        .target = target,
+        .optimize = optimize,
+    });
+    const tests = b.addExecutable(.{
+        .name = "uv_run_tests_a",
+        .root_module = tests_module,
+    });
+    tests_module.addCSourceFiles(.{
+        .root = test_root,
+        .files = test_sources,
+        .flags = cflags,
+    });
+    if (tinfo.os.tag == .windows) {
         tests_module.addCSourceFiles(.{
             .root = test_root,
-            .files = test_sources,
+            .files = win_test_sources,
             .flags = cflags,
         });
-        if (tinfo.os.tag == .windows) {
-            tests_module.addCSourceFiles(.{
-                .root = test_root,
-                .files = win_test_sources,
-                .flags = cflags,
-            });
-            tests_module.addCSourceFile(.{
-                .file = src_root.path(b, "win/snprintf.c"),
-                .flags = cflags,
-            });
-        } else {
-            tests_module.addCSourceFiles(.{
-                .root = test_root,
-                .files = unix_test_sources,
-                .flags = cflags,
-            });
-        }
-        tests_module.addIncludePath(src_root);
-        tests_module.addIncludePath(include_root);
-        tests_module.linkLibrary(lib);
+        tests_module.addCSourceFile(.{
+            .file = src_root.path(b, "win/snprintf.c"),
+            .flags = cflags,
+        });
+    } else {
+        tests_module.addCSourceFiles(.{
+            .root = test_root,
+            .files = unix_test_sources,
+            .flags = cflags,
+        });
+    }
+    tests_module.addIncludePath(src_root);
+    tests_module.addIncludePath(include_root);
+    tests_module.linkLibrary(lib);
+
+    var benchmarks_module = b.createModule(.{
+        .target = target,
+        .optimize = optimize,
+    });
+    const benchmarks = b.addExecutable(.{
+        .name = "uv_run_benchmarks_a",
+        .root_module = benchmarks_module,
+    });
+
+    benchmarks_module.addCSourceFiles(.{
+        .root = test_root,
+        .files = benchmark_sources,
+        .flags = cflags,
+    });
+    if (tinfo.os.tag == .windows) {
+        benchmarks_module.addCSourceFiles(.{
+            .root = test_root,
+            .files = win_test_sources,
+            .flags = cflags,
+        });
+        benchmarks_module.addCSourceFile(.{
+            .file = src_root.path(b, "win/snprintf.c"),
+            .flags = cflags,
+        });
+    } else {
+        benchmarks_module.addCSourceFiles(.{
+            .root = test_root,
+            .files = unix_test_sources,
+            .flags = cflags,
+        });
+    }
+    benchmarks_module.addIncludePath(src_root);
+    benchmarks_module.addIncludePath(include_root);
+    benchmarks_module.linkLibrary(lib);
+
+    if (build_tests) {
         b.installArtifact(tests);
     }
 
     if (build_benchmarks) {
-        var benchmarks_module = b.createModule(.{
-            .target = target,
-            .optimize = optimize,
-        });
-        const benchmarks = b.addExecutable(.{
-            .name = "uv_run_benchmarks_a",
-            .root_module = benchmarks_module,
-        });
-
-        benchmarks_module.addCSourceFiles(.{
-            .root = test_root,
-            .files = benchmark_sources,
-            .flags = cflags,
-        });
-        if (tinfo.os.tag == .windows) {
-            benchmarks_module.addCSourceFiles(.{
-                .root = test_root,
-                .files = win_test_sources,
-                .flags = cflags,
-            });
-            benchmarks_module.addCSourceFile(.{
-                .file = src_root.path(b, "win/snprintf.c"),
-                .flags = cflags,
-            });
-        } else {
-            benchmarks_module.addCSourceFiles(.{
-                .root = test_root,
-                .files = unix_test_sources,
-                .flags = cflags,
-            });
-        }
-        benchmarks_module.addIncludePath(src_root);
-        benchmarks_module.addIncludePath(include_root);
-        benchmarks_module.linkLibrary(lib);
         b.installArtifact(benchmarks);
     }
+
+    const run_tests = b.addRunArtifact(tests);
+    run_tests.setCwd(upstream.path(""));
+    const run_tests_step = b.step("run-tests", "Run the libuv test suite");
+    run_tests_step.dependOn(&run_tests.step);
+
+    const run_benchmarks = b.addRunArtifact(benchmarks);
+    const run_benchmarks_step = b.step("run-benchmarks", "Run the libuv test suite");
+    run_benchmarks_step.dependOn(&run_benchmarks.step);
 }
 
 // Kludge to work around optimization enum member naming change in zig 0.17
